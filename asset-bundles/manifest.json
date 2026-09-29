@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "files": 8,
+  "parts": [
+    {
+      "name": "assets-000.gzpart",
+      "sha256": "3aa77f64c773c2444babffe53a113764f3ea27cae549d1fbbdd53598d7ea956b",
+      "size": 4194304
+    },
+    {
+      "name": "assets-001.gzpart",
+      "sha256": "5b7bb07c2ddf77b22e7b53567312965a5579d4a7df33526ce333823f11165e98",
+      "size": 2562926
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "fort-collins-worlds",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run assets:restore && node validate.mjs",
+    "assets:restore": "node scripts/restore-assets.mjs",
+    "predev": "npm run assets:restore"
+  },
+  "devDependencies": {
+    "vite": "6.1.0"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

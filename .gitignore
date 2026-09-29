@@ -1,0 +1,14 @@
+node_modules/
+.sites-runtime/
+.build-check/
+
+# Restored losslessly from asset-bundles; keep original provenance.
+/dist/data/aerial.jpg
+/qa/results/aerial-after.jpg
+/qa/results/armstrong-after.jpg
+/qa/results/linden-after.jpg
+/qa/results/linden-before.jpg
+/qa/results/northern-after.jpg
+/qa/results/northern-before.jpg
+/qa/results/square-after.jpg
+.vercel/

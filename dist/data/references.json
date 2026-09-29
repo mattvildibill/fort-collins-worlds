@@ -1,0 +1,100 @@
+{
+  "use": "Reference photographs for architectural features; no photographic facade projection. Photographers do not endorse this reconstruction.",
+  "photographs": [
+    {
+      "name": "Northern Hotel",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Northern_Hotel_and_John_Atencio,_2020-04-20.jpg",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Northern_Hotel_and_John_Atencio%2C_2020-04-20.jpg",
+      "author": "Xnatedawgx",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "date": "2020-04-20",
+      "size": [
+        2506,
+        2106
+      ],
+      "visualNotes": "Four floors: tall glazed retail ground floor plus three window tiers. White/cream painted facade with shallow vertical pilasters; repeated tan panels and round/diamond medallions between upper windows. Narrow upright sash windows; black ground-floor fascia; shallow stepped flat-roof parapet and a prominent black vertical HOTEL blade with horizontal NORTHERN top. Southern party wall has a metal fire escape. Photo has a blue cast; do not sample white facade as cyan."
+    },
+    {
+      "name": "Armstrong Hotel",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Armstrong_Hotel.jpg",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Armstrong_Hotel.jpg",
+      "author": "Gribeco (Kimon Berlin)",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "date": "2012-09-09",
+      "size": [
+        5123,
+        2798
+      ],
+      "visualNotes": "Three-story red brick corner block; flat roof behind shallow stepped parapet, pale coping and dark horizontal masonry band near roof. Small rectangular upper windows with striped projecting awnings; larger glazed retail ground floor and long striped awnings. Trees conceal much of elevation and signage, so use as massing/material reference rather than complete window count. City historical context independently confirms three stories, symmetric upper windows, display ground-floor windows, and flat roof with central parapet."
+    },
+    {
+      "name": "201 Linden / Linden Hotel",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:201_Linden_October_2024.jpg",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/201_Linden_October_2024.jpg",
+      "author": "LiquidPerson",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "date": "2024-10-16",
+      "size": [
+        3000,
+        4000
+      ],
+      "visualNotes": "Three-story red/orange brick corner building with tan stone trim and blue-gray painted metal details. Chamfered corner entrance under tall round arch; projecting polygonal bay across both upper floors with small faceted cap. Above it, a much taller pointed/pyramidal corner roof with semicircular ornament. Deep metal bracketed cornice wraps both street elevations; roof-edge cresting. Second-floor side windows have rounded stone crowns; third-floor windows have flat heads within tan bands. Photo clearly shows overhead strings and suspended circular light ring in foreground."
+    },
+    {
+      "name": "Old Town Square corner building",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Old_Town_Square_October_2024.jpg",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/7/76/Old_Town_Square_October_2024.jpg",
+      "author": "LiquidPerson",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "date": "2024-10-16",
+      "size": [
+        3000,
+        4000
+      ],
+      "visualNotes": "Three-story red brick building with a narrow chamfered/angled corner face, gray metal-clad polygonal upper bay and a black arched storefront below. Stepped brick parapet culminates in clipped-peak center panel with diamond Old Town Square emblem and a metal star above. Rectangular gold/tan framed upper windows, cream lintels, black awnings, plaza planters and contemporary lantern pole. Skeletons are seasonal decorations. Photo does not establish the whole building footprint."
+    },
+    {
+      "name": "Old Town pedestrian court / Historic District",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fort_Collins_Historic_District.JPG",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/5/57/Fort_Collins_Historic_District.JPG",
+      "author": "Wusel007",
+      "license": "CC BY-SA 3.0 (also offered under GFDL 1.2+)",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "date": "2010-07-27",
+      "size": [
+        3264,
+        2448
+      ],
+      "visualNotes": "Pedestrian court reference: exposed aged brick side walls with ghost lettering, dark framed sash windows and sandstone sills, two-story storefront in background with elaborate white cornice and tall narrow upper windows. Concrete paving with brick bands, low raised planters, round planters, black railings/benches, globe lamps and cafe umbrellas. Includes a prominently painted horse sculpture; use court/architectural context, not as a neutral facade texture. Predates 2015 square renovation."
+    },
+    {
+      "name": "Linden Hotel streetscape with cyclists",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Downtown_Fort_Collins_Colorado.jpg",
+      "assetUrl": "https://upload.wikimedia.org/wikipedia/commons/0/09/Downtown_Fort_Collins_Colorado.jpg",
+      "author": "Citycommunications at English Wikipedia",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "date": "2008-07-09 EXIF; originally uploaded 2009-04-20",
+      "size": [
+        1500,
+        1000
+      ],
+      "visualNotes": "Wider view of same 201 Linden corner confirms three-story brick mass, blue-gray corner bay/tower, tan trim, large sidewalk trees, flowers in raised/circular beds and low neighboring storefront rhythm. Strongly saturated tourism photograph; foreground cyclists and trees conceal parts of facade. Good scene composition reference; not enough evidence for surveyed footprint/dimensions."
+    }
+  ],
+  "lidar": {
+    "dataset": "USGS South Platte River Lot 2a, 2013",
+    "publicationYear": 2015,
+    "catalog": "https://planetarycomputer.microsoft.com/dataset/3dep-lidar-copc",
+    "items": [
+      "USGS_LPC_CO_SoPlatteRiver_Lot2a_2013_13TDE493492_LAS_2015",
+      "USGS_LPC_CO_SoPlatteRiver_Lot2a_2013_13TDE493491_LAS_2015",
+      "USGS_LPC_CO_SoPlatteRiver_Lot2a_2013_13TDE492492_LAS_2015"
+    ],
+    "sampling": "1.5 m COPC resolution; EPSG:26913 reprojected to local geographic coordinates; classes 1/2 used; robust inward-footprint dominant-roof estimate. No claim of 2026 survey accuracy."
+  }
+}
