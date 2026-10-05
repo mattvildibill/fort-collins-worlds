@@ -21,3 +21,5 @@ assert(fixed>50000&&grow>10000);assert.equal(JSON.stringify(data.buildings.map(b
 for(const scale of [.5,1,3]){const s=interpret(`${scale} times taller buildings`);assert.equal(s.state.height,scale);if(scale!==1)assert(s.notes.some(n=>n.includes('core')))}
 assert(source.includes('mix(1.0,uScale,growth)'));assert(fs.readFileSync('dist/fallback.js','utf8').includes('b.arch?.protected?0:s.height-1'));
 console.log(`Reconstruction checked: ${model.stats.windows} modeled windows, ${model.stats.facades} detailed facade edges; ${fixed.toLocaleString()} protected vertices remain fixed at 3× growth.`);
+
+execFileSync(process.execPath,['scripts/check-ui.mjs'],{stdio:'inherit'});

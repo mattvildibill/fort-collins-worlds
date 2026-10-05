@@ -1,5 +1,7 @@
 # Fort Collins · Alternate Worlds
 
+[Live explorer](https://fort-collins.mattvildibill.com) · [Matt Vildibill’s portfolio](https://mattvildibill.com)
+
 An interactive geographic reconstruction of downtown Fort Collins using bundled Three.js, public geospatial data, photo-guided landmarks, and a local scenario interpreter. Production is static `dist/`; no API key or installation is needed to use the hosted explorer.
 
 ## Geographic base
@@ -19,7 +21,7 @@ All source footprint and road coordinates are preserved. The detailed core has i
 
 ## Reproducibility and checks
 
-`npm run dev` serves the local project. `npm run build` validates data, source syntax, normals, scenarios and immutable core geometry. `qa/REVIEW.md` records the critical review, inspected viewpoints, remaining limitations and the distinction between native geometric rendering and browser WebGL verification. Browser UI/fallback behavior was checked; the provided browser disables WebGL, so its final GPU appearance and performance remain unverified.
+`npm run dev` serves the local project. `npm run build` validates data, source syntax, normals, scenarios and immutable core geometry, plus UI state, repeated toggles, hidden-panel recovery and inline prompt validation. `qa/REVIEW.md` records the critical review, inspected viewpoints, remaining limitations and the distinction between native geometric rendering and browser WebGL verification. Browser UI/fallback behavior was checked; the provided browser disables WebGL, so its final GPU appearance and performance remain unverified.
 
 Data workflow: `prepare_data.py` establishes the original compact geographic base; `refine_data.py` adds photograph-informed architecture and mapped objects from a supplied OSM XML extract; `derive_lidar.py` consumes spatially cropped COPC point arrays; `supplement_geometry.py` restores relation-based plaza and rail geometry; `refine_roofs.py` and `refine_paving.py` create explicitly inferred roof and pavement details. Python processing uses NumPy, SciPy, Shapely, pyproj, laspy and Pillow. These are authoring dependencies only, not runtime requirements.
 
