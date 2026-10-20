@@ -2,7 +2,7 @@
 
 [Live explorer](https://fort-collins.mattvildibill.com) · [Matt Vildibill’s portfolio](https://mattvildibill.com)
 
-An interactive geographic reconstruction of downtown Fort Collins using bundled Three.js, public geospatial data, photo-guided landmarks, and a local scenario interpreter. Production is static `dist/`; no API key or installation is needed to use the hosted explorer.
+I love Fort Collins. This is a way to explore its downtown and try a few “what if” versions of the same place. It uses bundled Three.js, public geospatial data, photo-guided landmarks, and a local scenario interpreter. Production is static `dist/`; no API key or installation is needed to use the hosted explorer.
 
 ## Geographic base
 
@@ -21,8 +21,12 @@ All source footprint and road coordinates are preserved. The detailed core has i
 
 ## Reproducibility and checks
 
-`npm run dev` serves the local project. `npm run build` validates data, source syntax, normals, scenarios and immutable core geometry, plus UI state, repeated toggles, hidden-panel recovery and inline prompt validation. `qa/REVIEW.md` records the critical review, inspected viewpoints, remaining limitations and the distinction between native geometric rendering and browser WebGL verification. Browser UI/fallback behavior was checked; the provided browser disables WebGL, so its final GPU appearance and performance remain unverified.
+`npm run dev` serves the local project. The Places selector works on every screen; Green streets is a one-click starting point. The scenario editor starts closed so the city stays in view. Compare has a separate, keyboard-accessible divider. `?preset=green` opens that preset directly, and `?view=map` opens the lightweight aerial edition. `npm run build` validates data, source syntax, normals, scenarios and immutable core geometry, plus UI state, repeated toggles, hidden-panel recovery and inline prompt validation. `qa/REVIEW.md` records the critical review, inspected viewpoints, remaining limitations and the distinction between native geometric rendering and browser WebGL verification. Browser checks cover the aerial edition and responsive controls. A separate 1280 × 800 browser pass rendered the 3D baseline and Green streets comparison using Chromium’s software WebGL renderer. Hardware frame rates, Safari/iOS and physical-device behavior remain unverified.
 
 Data workflow: `prepare_data.py` establishes the original compact geographic base; `refine_data.py` adds photograph-informed architecture and mapped objects from a supplied OSM XML extract; `derive_lidar.py` consumes spatially cropped COPC point arrays; `supplement_geometry.py` restores relation-based plaza and rail geometry; `refine_roofs.py` and `refine_paving.py` create explicitly inferred roof and pavement details. Python processing uses NumPy, SciPy, Shapely, pyproj, laspy and Pillow. These are authoring dependencies only, not runtime requirements.
 
 Native inspection requires `@napi-rs/canvas` (set `QA_NODE_ROOT` to its install directory), pyrender, modern PyOpenGL, NumPy, and Pillow. Exported geometry is temporary; reviewed images are retained under `qa/results/`. No generated assets or source data depend on a live third-party request during exploration.
+
+### Browser regression checks
+
+With the local server running, `python scripts/check-browser.py --url http://127.0.0.1:5176` exercises portrait, compact-height and landscape layouts, pointer/keyboard comparison, places, scenario negation, dialogs and error recovery. It requires Python Playwright and Chromium. These tests explicitly exercise the map edition with WebGL disabled; they do not establish GPU fidelity or real-device frame rates. The regression also verifies that the map path does not request Three.js, terrain or the full-size aerial image and stops scheduling animation frames while idle.

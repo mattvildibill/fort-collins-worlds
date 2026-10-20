@@ -1,24 +1,24 @@
-// Focused DOM-adapter tests; these do not claim browser/GPU verification.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-const source=fs.readFileSync('dist/app.js','utf8'),html=fs.readFileSync('dist/index.html','utf8');
+import {setupControls,GREEN} from '../dist/ui.js';
 const nodes=new Map();
-function node(id){if(!nodes.has(id)){const classes=new Set();nodes.set(id,{hidden:false,textContent:'',innerHTML:'',attrs:{},classList:{toggle(k,on){if(on===undefined)on=!classes.has(k);on?classes.add(k):classes.delete(k);return on},contains:k=>classes.has(k)},setAttribute(k,v){this.attrs[k]=String(v)},removeAttribute(k){delete this.attrs[k]},focus(){this.focused=true}})}return nodes.get(id)}
-const document={body:node('body')};
-const helpers=source.slice(source.indexOf('function setTour('),source.indexOf('function setView('));
-let accepted='';
-const ui=Function('$','document','simulate',`let tour=false;${helpers};return {setTour,setImmersive,setPanelCollapsed,clearPromptError,submitScenario,isTour:()=>tour}`)(node,document,text=>{if(text==='invalid')throw Error('Try a supported change.');accepted=text});
-ui.setTour(true);assert(ui.isTour());assert.equal(node('tour').attrs['aria-pressed'],'true');assert(node('tour').innerHTML.includes('Pause'));
-ui.setTour(false);assert(!ui.isTour());assert.equal(node('tour').attrs['aria-pressed'],'false');assert(node('tour').innerHTML.includes('Tour'));
-for(const on of [true,false,true,false]){ui.setImmersive(on);assert.equal(document.body.classList.contains('immersive'),on);assert.equal(node('focus').attrs['aria-pressed'],String(on))}
-ui.setPanelCollapsed(true);assert.equal(node('collapse').attrs['aria-expanded'],'false');assert.equal(node('collapse').attrs['aria-label'],'Expand scenario panel');
-ui.setPanelCollapsed(false);assert.equal(node('collapse').attrs['aria-expanded'],'true');assert.equal(node('collapse').attrs['aria-label'],'Collapse scenario panel');
-ui.submitScenario('invalid');assert.equal(node('prompt').attrs['aria-invalid'],'true');assert(!node('prompt-error').hidden);assert(node('prompt').focused);
-ui.clearPromptError();assert(node('prompt-error').hidden);assert.equal(node('prompt').attrs['aria-invalid'],undefined);
-ui.submitScenario('More trees');assert.equal(accepted,'More trees');
-const viewFunction=source.slice(source.indexOf('function setView('),source.indexOf('function setMode('));
-const setView=Function('$','setImmersive','setPanelCollapsed','toast',`let hasScenario=false,view='reality';${viewFunction};return setView`)(node,ui.setImmersive,ui.setPanelCollapsed,()=>{});
-ui.setImmersive(true);ui.setPanelCollapsed(true);setView('scenario');assert(!document.body.classList.contains('immersive'));assert(!node('scenario-panel').classList.contains('collapsed'));assert(node('prompt').focused);
-assert.match(html,/id="scene" tabindex="0"/);assert.match(html,/aria-describedby="prompt-help prompt-error"/);assert.match(html,/id="prompt-error"[^>]*role="alert"/);assert.match(html,/aria-controls="panel-body"/);assert(!fs.readFileSync('dist/style.css','utf8').includes('@import'));
-assert.match(source,/e\.key\.toLowerCase\(\)/);assert.match(fs.readFileSync('dist/portfolio-embed.js','utf8'),/\.scene-only, \.immersive/);
-console.log('UI state, repeated toggle, hidden-panel recovery, inline validation, keyboard case normalization and accessible shell checks pass.');
+function node(id){if(!nodes.has(id)){const classes=new Set();nodes.set(id,{id,value:'',hidden:false,textContent:'',innerHTML:'',attrs:{},style:{},dataset:{},children:[],classList:{toggle(k,on){if(on===undefined)on=!classes.has(k);on?classes.add(k):classes.delete(k);return on;},contains:k=>classes.has(k)},setAttribute(k,v){this.attrs[k]=String(v);},removeAttribute(k){delete this.attrs[k];},focus(){this.focused=true;},addEventListener(){},append(child){this.children.push(child);},replaceChildren(){this.children=[];},showModal(){this.open=true;},close(){this.open=false;}});}return nodes.get(id);}
+const place=node('place');place.dataset.place='river';
+globalThis.document={getElementById:node,body:node('body'),querySelectorAll:query=>query==='[data-place]'?[place]:[],createElement:()=>node('new-'+nodes.size)};
+globalThis.window={addEventListener(){}};globalThis.matchMedia=()=>({matches:true});globalThis.location={search:''};
+const events=[],ui=setupControls({onScenario:s=>events.push(['scenario',s]),onView:v=>events.push(['view',v]),onPlace:k=>events.push(['place',k]),onMode:m=>events.push(['mode',m]),onTour:t=>events.push(['tour',t]),onSplit:n=>events.push(['split',n])});
+assert(node('scenario-panel').classList.contains('collapsed'));assert.equal(node('collapse').attrs['aria-expanded'],'false');
+node('collapse').onclick();assert.equal(node('collapse').attrs['aria-expanded'],'true');
+ui.apply(GREEN);assert(ui.getState().scenario.tram);assert.equal(ui.getState().view,'scenario');assert(node('scenario-panel').classList.contains('collapsed'));
+assert.equal(node('interpretation').textContent,'');assert(node('change-chips').children.length>0);
+ui.setView('compare');assert.equal(ui.getState().view,'compare');assert.equal(node('split').hidden,false);assert(document.body.classList.contains('comparing'));assert(node('scenario-panel').classList.contains('collapsed'));
+node('split-range').oninput({target:{value:'80'}});assert.deepEqual(events.at(-1),['split',.8]);
+ui.jump('river');assert.equal(node('place-select').value,'river');assert(place.classList.contains('selected'));assert.deepEqual(events.at(-1),['place','river']);
+ui.setMode('walk');assert.equal(node('walk').attrs['aria-pressed'],'true');
+node('prompt').value='purple elephants';node('scenario-form').onsubmit({preventDefault(){}});assert.equal(node('prompt').attrs['aria-invalid'],'true');assert(node('prompt').focused);assert(node('prompt-error').textContent.includes('previous preview is unchanged'));assert.equal(ui.getState().view,'compare');
+node('reset').onclick();assert.equal(ui.getState().view,'reality');assert.equal(node('prompt').attrs['aria-invalid'],undefined);assert(node('result').hidden);
+node('tour').onclick();assert.equal(node('tour').attrs['aria-pressed'],'true');ui.stopTour();assert.equal(node('tour').attrs['aria-pressed'],'false');
+node('info').onclick();assert(node('about').open);node('close-about').onclick();assert(!node('about').open);
+location.search='?preset=green';ui.startFromURL();assert(ui.getState().scenario.tram);assert.equal(ui.getState().view,'scenario');
+const html=fs.readFileSync('dist/index.html','utf8');assert.match(html,/id="scene" tabindex="0"/);assert.match(html,/aria-describedby="prompt-help prompt-error"/);assert.match(html,/id="prompt-error"[^>]*role="alert"/);assert.match(html,/aria-controls="panel-body"/);assert.match(html,/id="about" aria-labelledby="about-title"/);assert.match(html,/label for="place-select"/);
+console.log('Shared controls: compact editor, final-state results, scenario/compare/reset transitions, pointer values, keyboard places, errors, dialogs and direct preset pass.');

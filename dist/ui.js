@@ -1,0 +1,40 @@
+import {BASE,interpret,describeScenario} from './scenario.js';
+export const places={oldtown:{name:'Old Town Square',lon:-105.0759,lat:40.58761,d:260},college:{name:'College Avenue',lon:-105.07705,lat:40.58675,d:340},oak:{name:'Oak Street Plaza',lon:-105.07766,lat:40.5856,d:250},library:{name:'Library Park',lon:-105.07289,lat:40.58498,d:350},river:{name:'Poudre River',lon:-105.07135,lat:40.59125,d:440}};
+export const GREEN='Turn downtown into a car-free green district with a tram and rooftop gardens';
+const $=id=>document.getElementById(id);
+export function setupControls(engine){
+ let scenario={...BASE},hasScenario=false,view='reality',mode='fly',tour=false,labels=true;
+ const compact=()=>matchMedia('(max-width:850px), (max-height:650px)').matches;
+ function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,5000);}
+ function collapse(closed){$('scenario-panel').classList.toggle('collapsed',closed);$('collapse').textContent=closed?'+':'−';$('collapse').setAttribute('aria-expanded',String(!closed));$('collapse').setAttribute('aria-label',closed?'Edit scenario':'Close scenario editor');}
+ function immersive(on){document.body.classList.toggle('immersive',on);$('focus').setAttribute('aria-pressed',String(on));$('focus').title=on?'Show controls':'Hide controls';}
+ function setTour(on){tour=on;$('tour').setAttribute('aria-pressed',String(on));$('tour').innerHTML=on?'Ⅱ <span>Pause</span>':'▷ <span>Tour</span>';engine.onTour?.(on);}
+ function setMode(next){if(next===mode){setTour(false);return;}mode=next;setTour(false);for(const k of ['walk','fly']){$(k).classList.toggle('active',k===next);$(k).setAttribute('aria-pressed',String(k===next));}if(compact())collapse(true);engine.onMode?.(next);}
+ function setView(next){
+  if(next!=='reality'&&!hasScenario){immersive(false);collapse(false);toast('Start with Green streets or choose a supported change.');$('prompt').focus();return;}
+  view=next;for(const k of ['reality','alternate','compare']){const on=(k==='alternate'?'scenario':k)===next;$(k).classList.toggle('active',on);$(k).setAttribute('aria-pressed',String(on));}
+  $('split').hidden=next!=='compare';document.body.classList.toggle('comparing',next==='compare');if(next==='compare')collapse(true);
+  $('world-caption').textContent=next==='reality'?'Explore downtown, then try a different version.':next==='compare'?'Same place, with your changes on the right.':'Your changes, on the same city map.';engine.onView?.(next);
+ }
+ function sync(){for(const k of ['trees','traffic','time'])$(k).value=scenario[k];$('height').value=scenario.height*100;$('season').value=scenario.season;$('streets').value=scenario.streets;$('trees-value').textContent=scenario.trees===30?'Current':scenario.trees>30?'More':'Fewer';$('height-value').textContent=Number(scenario.height.toFixed(2))+'×';$('traffic-value').textContent=scenario.traffic+'% of baseline';$('time-value').textContent=String(scenario.time).padStart(2,'0')+':00';}
+ function clearError(){$('prompt-error').hidden=true;$('prompt-error').textContent='';$('prompt').removeAttribute('aria-invalid');}
+ function results(changes,notes=[]){$('result').hidden=false;$('scenario-name').textContent=scenario.historic?'Historic-inspired':'Changes applied';$('interpretation').textContent='';$('change-chips').replaceChildren();for(const change of changes){const chip=document.createElement('span');chip.textContent=change;$('change-chips').append(chip);}$('limits').textContent=notes.join(' ');$('limits').hidden=!notes.length;$('panel-summary').textContent=changes.slice(0,2).join(' · ');}
+ function apply(text){const result=interpret(text);scenario=result.state;hasScenario=true;clearError();sync();results(result.changes,result.notes);engine.onScenario?.(scenario);$('place-title').textContent='A different Fort Collins.';setView('scenario');if(compact())collapse(true);return result;}
+ function submit(text){try{return apply(text);}catch(error){$('prompt-error').textContent=error.message+(hasScenario?' Your previous preview is unchanged.':'');$('prompt-error').hidden=false;$('prompt').setAttribute('aria-invalid','true');collapse(false);$('prompt').focus();}}
+ function jump(key){if(!places[key])return;setTour(false);$('place-select').value=key;document.querySelectorAll('[data-place]').forEach(b=>b.classList.toggle('selected',b.dataset.place===key));$('place-title').textContent=places[key].name;engine.onPlace?.(key);}
+ $('collapse').onclick=()=>collapse(!$('scenario-panel').classList.contains('collapsed'));
+ $('reality').onclick=()=>setView('reality');$('alternate').onclick=()=>setView('scenario');$('compare').onclick=()=>setView('compare');$('walk').onclick=()=>setMode('walk');$('fly').onclick=()=>setMode('fly');$('home').onclick=()=>jump('oldtown');
+ $('tour').onclick=()=>{if(mode==='walk')setMode('fly');setTour(!tour);if(tour)toast('Five places around downtown. Drag the view to stop the tour.');};
+ $('focus').onclick=()=>immersive(!document.body.classList.contains('immersive'));$('label-toggle').onclick=()=>{labels=!labels;$('label-toggle').setAttribute('aria-pressed',String(labels));engine.onLabels?.(labels);};
+ $('place-select').onchange=e=>jump(e.target.value);document.querySelectorAll('[data-place]').forEach(b=>b.onclick=()=>jump(b.dataset.place));
+ $('green-start').onclick=()=>{$('prompt').value=GREEN;submit(GREEN);};
+ $('scenario-form').onsubmit=e=>{e.preventDefault();submit($('prompt').value);};document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('prompt').value=b.dataset.prompt;submit(b.dataset.prompt);});$('prompt').addEventListener('input',clearError);
+ $('reset').onclick=()=>{scenario={...BASE};hasScenario=false;sync();clearError();engine.onScenario?.(scenario);setView('reality');$('result').hidden=true;$('panel-summary').textContent='Streets, trees, seasons and light';$('prompt').value='';$('place-title').textContent='Explore Fort Collins.';};
+ for(const k of ['trees','height','traffic','time','season','streets'])$(k).addEventListener('input',()=>{scenario={...scenario,[k]:['season','streets'].includes(k)?$(k).value:+$(k).value/(k==='height'?100:1)};if(k==='streets'){scenario.tram=scenario.streets==='transit';if(scenario.streets==='pedestrian')scenario.traffic=0;}hasScenario=true;sync();engine.onScenario?.(scenario);results(describeScenario(scenario));setView('scenario');});
+ $('split-range').oninput=e=>{const value=+e.target.value/100;$('divider').style.left=value*100+'%';engine.onSplit?.(value);};
+ for(const key of ['info','sources'])$(key).onclick=()=>{setTour(false);engine.onPauseInput?.();$('about').showModal();};$('close-about').onclick=()=>$('about').close();$('about').onclick=e=>{if(e.target===$('about')){const r=$('about').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('about').close();}};
+ window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('about').open){immersive(false);setTour(false);}});
+ const context=document.modelContext;if(context?.registerTool){const lifecycle=new AbortController();window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});try{Promise.resolve(context.registerTool({name:'simulate_fort_collins',title:'Preview a Fort Collins scenario',description:'Apply supported local changes to the city.',inputSchema:{type:'object',properties:{scenario:{type:'string',minLength:3,maxLength:700}},required:['scenario'],additionalProperties:false},annotations:{readOnlyHint:false},execute:async input=>{if(!input||typeof input.scenario!=='string'||input.scenario.length>700)throw Error('Provide a scenario up to 700 characters.');$('prompt').value=input.scenario;return apply(input.scenario);}},{signal:lifecycle.signal})).catch(()=>{});}catch{}}
+ sync();collapse(true);
+ return {stopTour:()=>setTour(false),jump,setMode,setView,apply,collapse,toast,startFromURL(){if(new URLSearchParams(location.search).get('preset')==='green'){$('prompt').value=GREEN;submit(GREEN);}},getState:()=>({scenario,view,mode,tour,labels})};
+}

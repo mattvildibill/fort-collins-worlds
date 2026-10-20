@@ -3,11 +3,24 @@ import fs from 'node:fs';import assert from 'node:assert/strict';import {interpr
 const data=JSON.parse(fs.readFileSync('dist/data/city.json'));assert(data.buildings.length>1500);assert(data.roads.length>1000);assert(data.buildings.every(b=>b.p.length>=4&&Number.isFinite(b.h)));const terrain=JSON.parse(fs.readFileSync('dist/data/terrain.json'));assert.equal(terrain.elevation.length,terrain.size**2);assert(terrain.elevation.every(Number.isFinite));
 let r=interpret('A car-free downtown with a tram, rooftop gardens, taller buildings and snow at night');assert.equal(r.state.traffic,0);assert(r.state.tram);assert(r.state.gardens);assert(r.state.height>1);assert.equal(r.state.season,'winter');assert.equal(r.state.time,22);assert.equal(BASE.height,1);
 r=interpret('More trees but no tram, preserve building heights');assert.equal(r.state.tram,false);assert.equal(r.state.height,1);assert(r.state.trees>30);
+// Ordinary negations must not leave behind derived transit/traffic state.
+for(const text of ['do not add a tram','no tram','without a tram']){const value=interpret(text);assert.equal(value.state.tram,false,text);assert.equal(value.state.streets,'roads',text);assert.equal(value.state.traffic,100,text);assert(!value.changes.some(s=>s==='Tram corridor'),text);}
+r=interpret('More trees, no tram');assert.equal(r.state.trees,90);assert.equal(r.state.traffic,100);assert.equal(r.state.streets,'roads');assert(!r.changes.includes('Tram corridor'));
+r=interpret('not winter');assert.equal(r.state.season,'summer');assert(!r.changes.includes('Winter snow'));
+r=interpret('not winter, autumn');assert.equal(r.state.season,'autumn');
+r=interpret('more trees but no rooftop gardens');assert.equal(r.state.gardens,false);assert.equal(r.state.trees,90);assert(!r.changes.includes('Rooftop gardens'));
+r=interpret('A small town with a high density of trees');assert.equal(r.state.height,.75);assert.equal(r.state.future,false);assert.equal(r.state.trees,90);assert.equal(r.changes.filter(s=>s.includes('height')).length,1);
+r=interpret('not car-free');assert.equal(r.state.streets,'roads');assert.equal(r.state.traffic,100);
+r=interpret('a future city without a tram');assert.equal(r.state.tram,false);assert.notEqual(r.state.streets,'transit');
+r=interpret('car-free but keep parking');assert.equal(r.state.reclaim,false);
+r=interpret('less traffic');assert.equal(r.state.traffic,20);r=interpret('more traffic');assert.equal(r.state.traffic,100);
+r=interpret('not less traffic');assert.equal(r.state.traffic,100);r=interpret('without traffic');assert.equal(r.state.traffic,0);
+r=interpret('no trees');assert.equal(r.state.trees,0);r=interpret('do not remove trees');assert.equal(r.state.trees,30);
 assert.throws(()=>interpret('Flood downtown'));assert.throws(()=>interpret('purple elephants'));assert.throws(()=>interpret(''));r=interpret('A green city with flood water');assert(r.notes.length>0);
-const html=fs.readFileSync('dist/index.html','utf8');const refs=[...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map(x=>x[1]).filter(x=>!x.includes(':'));for(const p of refs)assert(fs.existsSync('dist/'+p),'Missing '+p);const jpg=fs.readFileSync('dist/data/aerial.jpg');assert.equal(jpg[0],255);assert.equal(jpg[1],216);
+const html=fs.readFileSync('dist/index.html','utf8');const refs=[...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map(x=>x[1]).filter(x=>!x.includes(':'));for(const p of refs){const path=p.split(/[?#]/)[0];if(path)assert(fs.existsSync('dist/'+path),'Missing '+p);}const jpg=fs.readFileSync('dist/data/aerial.jpg');assert.equal(jpg[0],255);assert.equal(jpg[1],216);const mapImage=fs.readFileSync('dist/data/aerial-map.webp');assert.equal(mapImage.toString('ascii',0,4),'RIFF');assert.equal(mapImage.toString('ascii',8,12),'WEBP');
 console.log(`Validated ${data.buildings.length} footprints, ${data.roads.length} road/path features, ${terrain.elevation.length} elevations; compositional scenarios, negation, unsupported input and static assets.`);
 
-for(const f of ['app.js','scenario.js','fallback.js','three.core.js','three.module.js','BufferGeometryUtils.js'])execFileSync(process.execPath,['--check','dist/'+f]);
+for(const f of ['entry.js','ui.js','map-app.js','app.js','scenario.js','fallback.js','three.core.js','three.module.js','BufferGeometryUtils.js'])execFileSync(process.execPath,['--check','dist/'+f]);
 const THREE=await import('./dist/three.module.js');const source=fs.readFileSync('dist/app.js','utf8');const ribbonSource=source.slice(source.indexOf('function ribbon('),source.indexOf('function buildRoads('));const ribbon=Function('THREE','elev',ribbonSource+';return ribbon;')(THREE,()=>0);for(const p of [[[0,0],[50,0]],[[0,0],[0,50]],[[0,0],[20,-20]]]){const g=ribbon(p,8);const ns=g.attributes.normal;assert([...ns.array].every(Number.isFinite));for(let i=0;i<ns.count;i++)assert(ns.getY(i)>.99,'Road surfaces must face upward');g.dispose()}
 console.log('Road orientation and finite geometry verified in all tested directions.');
 

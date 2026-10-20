@@ -8,10 +8,16 @@ Production branch: `main`.
 
 Use Node.js 24. Run `npm ci` when a lockfile is present, then `npm run build`. No application secrets or database are required. Never commit `.env` files or Vercel credentials.
 
-The portfolio launches one iframe at a time. Each project owns its runtime and assets. The embed bridge validates its parent origin; closing the viewer destroys the iframe and stops its work. Headers allow embedding from the portfolio. Original project attributions and model boundaries are retained.
+The portfolio links to each application in its own browser tab. Each project owns its runtime and assets. The optional embed bridge accepts only the portfolio origin and does not affect standalone navigation. Source attributions and model boundaries are retained.
 
-Existing ChatGPT-hosted versions have not been deleted or redirected. They remain active in Sites for existing shared links. New updates should be made in these GitHub repositories and deployed by Vercel; the legacy copies are retained for compatibility. If redirects are later installed on old hosts, preserve paths and query parameters.
+Legacy hosted copies have not been deleted or redirected; existing shared links remain independent. New updates should be made in these GitHub repositories and deployed by Vercel; the legacy copies are retained for compatibility. If redirects are later installed on old hosts, preserve paths and query parameters.
 
 ## Assets
 
 `asset-bundles/` stores lossless, SHA-256-verified assets recovered from the original source. `npm run assets:restore` restores them to their original paths; the build runs it automatically. Text source remains directly editable. Restore refuses to overwrite a modified local asset. To replace an asset, update and repack the bundles with `python scripts/pack-assets.py`; commit the resulting bundles and manifest.
+
+## Browser editions and entry links
+
+The startup entry checks WebGL capability before importing the 3D renderer. `?view=map` opens the Canvas map directly, without Three.js, terrain meshes or full-size aerial imagery. `?preset=green` applies the same Green streets preset as the visible button; combine both parameters when useful. The map renders on demand.
+
+`dist/data/aerial-map.webp` is a 1280-pixel derivative of the unchanged source aerial JPG for the lightweight map. Regenerate with Pillow using `thumbnail((1280, 1280))` and WebP quality 80, method 6. Geographic bounds and credits are unchanged. No map view requests external tiles.
